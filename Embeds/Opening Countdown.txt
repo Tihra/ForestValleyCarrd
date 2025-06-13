@@ -1,11 +1,43 @@
-<div id="openBox" style="display: none;">
-  <p style="color: green;">🏠 We are Open!</p>
+<style>
+  .venue-box {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9f9f9;
+  }
+
+  .open-box {
+    border-left: 6px solid #4CAF50;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .closed-box {
+    border-left: 6px solid #f44336;
+    background-color: #ffebee;
+    color: #c62828;
+  }
+
+  .countdown-timer {
+    font-weight: bold;
+    font-size: 1.0em;
+    margin-top: 10px;
+  }
+</style>
+
+<div id="openBox" class="venue-box open-box" style="display: none;">
+  <p>🏠 We are <strong>Open</strong>!</p>
 </div>
 
-<div id="closedBox" style="display: none;">
-  <p style="color: red;">
-    We are Closed – Opening in <span id="countdown"></span>
-  </p>
+<div id="closedBox" class="venue-box closed-box" style="display: none;">
+  <p>We are <strong>Closed</strong></p>
+  <div class="countdown-timer">
+    Opening in <span id="countdown"></span>
+  </div>
 </div>
 
 <script>
@@ -32,7 +64,7 @@ function updateVenueStatus() {
     openBox.style.display = 'none';
     closedBox.style.display = 'block';
 
-    // Calculate next Sunday 7:00 PM in AEST/AEDT
+    // Calculate next Sunday 7:00 PM AEST/AEDT
     let nextOpen = new Date(sydneyNow);
     let daysUntilSunday = (7 - sydneyNow.getDay()) % 7;
     if (sydneyNow.getDay() === 0 && sydneyNow.getHours() >= 19) {
