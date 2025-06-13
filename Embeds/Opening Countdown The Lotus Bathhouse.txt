@@ -1,0 +1,101 @@
+<style>
+  .venue-box {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9f9f9;
+  }
+
+  .open-box {
+    border-left: 6px solid #4CAF50;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .closed-box {
+    border-left: 6px solid #f44336;
+    background-color: #ffebee;
+    color: #c62828;
+  }
+
+  .countdown-timer {
+    font-weight: bold;
+    font-size: 1.0em;
+    margin-top: 10px;
+  }
+</style>
+
+<div id="openBox" class="venue-box open-box" style="display: none;">
+  <p>We are <strong>Open</strong>!</p>
+</div>
+
+<div id="closedBox" class="venue-box closed-box" style="display: none;">
+  <p>We are <strong>Closed</strong></p>
+  <div class="countdown-timer">
+    Opening in <span id="countdown"></span>
+  </div>
+</div>
+
+<script>
+function updateVenueStatus() {
+  const now = new Date();
+  const sydneyNow = new Date(now.toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+  const day = sydneyNow.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
+  const hour = sydneyNow.getHours();
+
+  const isOpenDay = (day === 1 || day === 5); // Monday or Friday
+  const isOpenHour = (hour >= 19 && hour < 23); // Between 7PM and 11PM
+  const isOpen = isOpenDay && isOpenHour;
+
+  const openBox = document.getElementById('openBox');
+  const closedBox = document.getElementById('closedBox');
+  const countdown = document.getElementById('countdown');
+
+  if (isOpen) {
+    openBox.style.display = 'block';
+    closedBox.style.display = 'none';
+  } else {
+    openBox.style.display = 'none';
+    closedBox.style.display = 'block';
+
+    // Determine next Friday or Monday at 7 PM
+    const daysToAdd = [1, 5].map(targetDay => {
+      let diff = targetDay - day;
+      if (diff < 0 || (diff === 0 && hour >= 23)) diff += 7;
+      return diff;
+    });
+
+    const nextInDays = Math.min(...daysToAdd);
+    const nextDay = [1, 5].find(d => {
+      const delta = d - day;
+      if (delta < 0) return (delta + 7) === nextInDays;
+      return delta === nextInDays;
+    });
+
+    let nextOpen = new Date(sydneyNow);
+    nextOpen.setDate(sydneyNow.getDate() + nextInDays);
+    nextOpen.setHours(19, 0, 0, 0); // 7 PM
+
+    const diff = nextOpen - sydneyNow;
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / (60 * 60 * 24));
+    const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    countdown.textContent =
+      `${days}d : ` +
+      `${String(hours).padStart(2, '0')}h : ` +
+      `${String(minutes).padStart(2, '0')}m : ` +
+      `${String(seconds).padStart(2, '0')}s`;
+  }
+}
+
+// Run on load and update every second
+updateVenueStatus();
+setInterval(updateVenueStatus, 1000);
+</script>
